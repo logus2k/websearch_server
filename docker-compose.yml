@@ -1,0 +1,19 @@
+services:
+  websearch_server:
+    build: .
+    image: websearch-server:0.1.0
+    container_name: websearch_server
+    ports:
+      - "4960:8080"            # host:container — direct probing only
+    environment:
+      PYTHONUNBUFFERED: "1"
+    # ISOLATION: only on mcp_internal — internet egress + reachable by
+    # mcp-service, but NO route to noted-network internals. It renders
+    # untrusted web pages, so it must not be able to reach internal services.
+    networks:
+      - mcp_internal
+    restart: unless-stopped
+
+networks:
+  mcp_internal:
+    external: true            # created once: `docker network create mcp_internal`
